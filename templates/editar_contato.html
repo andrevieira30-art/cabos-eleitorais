@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Contato{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h2 class="card-title mb-4">Editar Contato de Apoiadores</h2>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" value="{{ contato[1] or '' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">E-mail</label>
+                <input type="email" name="email" class="form-control" value="{{ contato[2] or '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Telefone</label>
+                <input type="text" name="telefone" class="form-control" value="{{ contato[3] or '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Endereço</label>
+                <input type="text" name="endereco" class="form-control" value="{{ contato[4] or '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Região Administrativa</label>
+                <input type="text" name="regiao_administrativa" class="form-control" value="{{ contato[5] or '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data de Nascimento</label>
+                <input type="date"
+                    name="data_nascimento"
+                    class="form-control"
+                    value="{{ contato[8].strftime('%Y-%m-%d') if contato[8] else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" name="cep" class="form-control" value="{{ contato[9] or '' }}" maxlength="10">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Região Administrativa</label>
+                <input type="text" name="regiao_administrativa" class="form-control" value="{{ contato[4] or '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Lider Responsável</label>
+                <select name="cabo_id" class="form-select" required>
+                    <option value="">Selecione</option>
+                    {% for cabo in cabos %}
+                        <option value="{{ cabo[0] }}" {% if contato[5] == cabo[0] %}selected{% endif %}>
+                            {{ cabo[1] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input"
+                       type="checkbox"
+                       value="S"
+                       name="consentiu_contato"
+                       id="consentiu"
+                       {% if contato[6] == 'S' %}checked{% endif %}>
+                <label class="form-check-label" for="consentiu">
+                    Consentiu receber contato
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Observação</label>
+                <textarea name="observacao" class="form-control" rows="3">{{ contato[7] or '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+            <a href="{{ url_for('listar_contatos') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+            <div class="mb-3">
+                <label class="form-label">Liderança responsável</label>
+                <select name="cabo_id" class="form-select" required>
+                    {% for cabo in cabos %}
+            <option value="{{ cabo[0] }}" {% if contato[6] == cabo[0] %}selected{% endif %}>
+                {{ cabo[1] }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="S" name="consentiu_contato" id="consentiu"
+                    {% if contato[7] == 'S' %}checked{% endif %}>
+                <label class="form-check-label" for="consentiu">
+                    Autorizou receber contato
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Observação</label>
+                <textarea name="observacao" class="form-control" rows="3">{{ contato[8] or '' }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data de Nascimento</label>
+                <input type="date" name="data_nascimento" class="form-control"
+                    value="{{ contato[9].strftime('%Y-%m-%d') if contato[9] else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" name="cep" class="form-control" value="{{ contato[10] or '' }}">
+</div>

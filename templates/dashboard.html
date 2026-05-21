@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+            <div>
+                <h2 class="card-title mb-2">Painel de Lideranças</h2>
+                <p class="text-muted mb-0">
+                    Acompanhe Lideres, Apoiadores e produtividade por região.
+                </p>
+            </div>
+            <div>
+                <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="" class="logo-dashboard">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('home') }}" class="row g-2">
+            <div class="col-md-10">
+                <select name="regiao" class="form-select">
+                    <option value="">Todas as regiões</option>
+                    {% for item in regioes %}
+                        <option value="{{ item }}" {% if regiao == item %}selected{% endif %}>{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 card-indicador card-cabos">
+            <div class="card-body">
+                <h5 class="card-title">Total de Lideres</h5>
+                <h1 class="display-5 fw-bold">{{ total_cabos }}</h1>
+                <p class="mb-0">Lideres cadastrados no sistema</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 card-indicador card-contatos">
+            <div class="card-body">
+                <h5 class="card-title">Total de Apoiadores</h5>
+                <h1 class="display-5 fw-bold">{{ total_contatos }}</h1>
+                <p class="mb-0">Contatos de apoiadores registrados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4 class="card-title mb-3">Ações rápidas</h4>
+        <div class="acoes-grid">
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-verde-claro">Cadastrar Lideres</a>
+            <a href="{{ url_for('listar') }}" class="btn btn-outline-success">Listar Lideres</a>
+            <a href="{{ url_for('cadastrar_contato') }}" class="btn btn-verde-claro">Cadastrar Apoiadores</a>
+            <a href="{{ url_for('listar_contatos') }}" class="btn btn-outline-success">Listar Apoiadores</a>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h4 class="card-title mb-3">Contatos por Lider</h4>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-contatos">
+                <thead class="table-light">
+                    <tr>
+                        <th>Lider</th>
+                        <th>Região Administrativa</th>
+                        <th>Total de Apoiadores</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ranking_cabos %}
+                    <tr>
+                        <td class="fw-semibold">{{ item[0] }}</td>
+                        <td>
+                            {% if item[1] %}
+                                <span class="badge rounded-pill text-bg-primary">{{ item[1] }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-success px-3 py-2">{{ item[2] }}</span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">Nenhum dado encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

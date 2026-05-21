@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro por Convite{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Concluir Cadastro</h2>
+
+                <p><strong>Convidado por:</strong> {{ nome_cabo }}</p>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" class="form-control" value="{{ email }}" disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" name="nome" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="text" name="telefone" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Endereço</label>
+                        <input type="text" name="endereco" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Região Administrativa</label>
+                        <input type="text" name="regiao_administrativa" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <input type="date" name="data_nascimento" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">CEP</label>
+                        <input type="text" name="cep" class="form-control">
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" value="S" name="consentiu_contato" id="consentiu">
+                        <label class="form-check-label" for="consentiu">
+                            Autorizo receber contato
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Observação</label>
+                        <textarea name="observacao" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Finalizar Cadastro</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

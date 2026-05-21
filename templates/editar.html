@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Editar{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="card-title mb-4">Editar Liderança</h2>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" value="{{ registro[1] }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="{{ registro[2] }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Telefone</label>
+                <input type="text" name="telefone" class="form-control" value="{{ registro[3] }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Endereço</label>
+                <input type="text" name="endereco" class="form-control" value="{{ registro[4] }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data de Nascimento</label>
+                <input type="date"
+                    name="data_nascimento"
+                    class="form-control"
+                    value="{{ registro[6].strftime('%Y-%m-%d') if registro[6] else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" name="cep" class="form-control" value="{{ registro[7] or '' }}" maxlength="10">
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Região Administrativa</label>
+                <input type="text" name="regiao_administrativa" class="form-control" value="{{ registro[5] or '' }}">
+            </div>
+
+            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+            <a href="{{ url_for('listar') }}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

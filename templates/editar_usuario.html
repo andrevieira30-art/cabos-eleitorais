@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuário{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="card-title mb-4">Editar Usuário</h2>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" name="nome" class="form-control" value="{{ usuario[1] }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control" value="{{ usuario[2] }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input type="password" name="senha" class="form-control" placeholder="Deixe em branco para manter a atual">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de Acesso</label>
+                        <select name="tipo_acesso" class="form-select" required>
+                            <option value="ADMIN" {% if usuario[3] == 'ADMIN' %}selected{% endif %}>ADMIN</option>
+                            <option value="DEPUTADO" {% if usuario[3] == 'DEPUTADO' %}selected{% endif %}>DEPUTADO</option>
+                            <option value="CHEFE_GABINETE" {% if usuario[3] == 'CHEFE_GABINETE' %}selected{% endif %}>CHEFE_GABINETE</option>
+                            <option value="SECRETARIA" {% if usuario[3] == 'SECRETARIA' %}selected{% endif %}>SECRETARIA</option>
+                            <option value="CABO" {% if usuario[3] == 'CABO' %}selected{% endif %}>CABO</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Liderança vinculada</label>
+                        <select name="cabo_id" class="form-select">
+                            <option value="">Nenhuma</option>
+                            {% for cabo in cabos %}
+                                <option value="{{ cabo[0] }}" {% if usuario[4] == cabo[0] %}selected{% endif %}>
+                                    {{ cabo[1] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ativo</label>
+                        <select name="ativo" class="form-select">
+                            <option value="S" {% if usuario[5] == 'S' %}selected{% endif %}>Sim</option>
+                            <option value="N" {% if usuario[5] == 'N' %}selected{% endif %}>Não</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                        <a href="{{ url_for('listar_usuarios') }}" class="btn btn-secondary">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

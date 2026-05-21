@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório Geral{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h2 class="card-title m-0">Relatório Geral</h2>
+        <small class="text-muted">Visão consolidada do sistema.</small>
+    </div>
+    <a href="{{ url_for('exportar_relatorio_geral_excel') }}" class="btn btn-success">
+        Exportar Relatório Excel
+    </a>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 card-indicador card-cabos">
+            <div class="card-body">
+                <h5 class="card-title">Total de Cabos</h5>
+                <h1 class="display-5 fw-bold">{{ total_cabos }}</h1>
+                <p class="mb-0">Lideres cadastrados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 card-indicador card-contatos">
+            <div class="card-body">
+                <h5 class="card-title">Total de Contatos</h5>
+                <h1 class="display-5 fw-bold">{{ total_contatos }}</h1>
+                <p class="mb-0">Apoiadores cadastrados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Gráfico de Contatos por Região</h4>
+                <canvas id="graficoRegioes"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h4 class="card-title mb-3">Gráfico de Contatos por Lider</h4>
+                <canvas id="graficoCabos"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <h4 class="card-title mb-3">Contatos por Região</h4>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-contatos">
+                <thead class="table-light">
+                    <tr>
+                        <th>Região</th>
+                        <th>Total de Contatos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in contatos_por_regiao %}
+                    <tr>
+                        <td>
+                            <span class="badge rounded-pill text-bg-primary">{{ item[0] }}</span>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-success px-3 py-2">{{ item[1] }}</span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="text-center text-muted py-4">Nenhum dado encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h4 class="card-title mb-3">Ranking de Lideres por Contatos</h4>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-cabos">
+                <thead class="table-light">
+                    <tr>
+                        <th>Cabo</th>
+                        <th>Região</th>
+                        <th>Total de Contatos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ranking_cabos %}
+                    <tr>
+                        <td class="fw-semibold">{{ item[0] }}</td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-primary">{{ item[1] }}</span>
+                        </td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-success px-3 py-2">{{ item[2] }}</span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">Nenhum dado encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const regioesLabels = {{ regioes_labels | tojson }};
+    const regioesValores = {{ regioes_valores | tojson }};
+
+    const cabosLabels = {{ cabos_labels | tojson }};
+    const cabosValores = {{ cabos_valores | tojson }};
+
+    new Chart(document.getElementById('graficoRegioes'), {
+        type: 'bar',
+        data: {
+            labels: regioesLabels,
+            datasets: [{
+                label: 'Contatos por Região',
+                data: regioesValores,
+                backgroundColor: 'rgba(76, 175, 80, 0.7)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('graficoCabos'), {
+        type: 'pie',
+        data: {
+            labels: cabosLabels,
+            datasets: [{
+                label: 'Contatos por Cabo',
+                data: cabosValores
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+{% endblock %}

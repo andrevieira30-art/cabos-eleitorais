@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Listar Lideranças{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+            <div>
+                <h2 class="card-title m-0">Lista de Lideranças</h2>
+                <small class="text-muted">Gerencie os líderes e acompanhe os apoiadores vinculados.</small>
+            </div>
+
+            <a href="{{ url_for('exportar_excel', busca=termo, regiao=regiao) }}" class="btn btn-success">
+                Exportar Excel
+            </a>
+        </div>
+
+        <form method="GET" action="{{ url_for('listar') }}" class="row g-2 mb-4">
+            <div class="col-md-5">
+                <input type="text"
+                       name="busca"
+                       class="form-control"
+                       placeholder="Pesquisar por nome"
+                       value="{{ termo or '' }}">
+            </div>
+
+            <div class="col-md-5">
+                <select name="regiao" class="form-select">
+                    <option value="">Todas as regiões</option>
+                    {% for item_regiao in regioes %}
+                        <option value="{{ item_regiao }}" {% if regiao == item_regiao %}selected{% endif %}>
+                            {{ item_regiao }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <a href="{{ url_for('listar') }}" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-cabos">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th style="width: 180px;">Nome</th>
+                        <th style="width: 220px;">Email</th>
+                        <th style="width: 135px;">Telefone</th>
+                        <th style="width: 210px;">Endereço</th>
+                        <th style="width: 120px;">Região</th>
+                        <th style="width: 120px;">Nascimento</th>
+                        <th style="width: 100px;">CEP</th>
+                        <th style="width: 90px;">Contatos</th>
+                        <th style="width: 140px;">Consentiu</th>
+                        <th style="width: 190px;">Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in registros %}
+                    <tr>
+                        <td>
+                            <span class="badge text-bg-secondary">#{{ item[0] }}</span>
+                        </td>
+
+                        <td class="fw-semibold nome-coluna">{{ item[1] or '-' }}</td>
+
+                        <td class="email-coluna">{{ item[2] or '-' }}</td>
+
+                        <td>{{ item[3] or '-' }}</td>
+
+                        <td class="texto-endereco">{{ item[4] or '-' }}</td>
+
+                        <td>
+                            {% if item[5] %}
+                                <span class="badge rounded-pill text-bg-primary">{{ item[5] }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ item[6].strftime('%d/%m/%Y') if item[6] else '-' }}</td>
+
+                        <td>{{ item[7] or '-' }}</td>
+
+                        <td>
+                            <span class="badge rounded-pill text-bg-success px-3 py-2">
+                                {{ item[8] or 0 }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="consentimento-box">
+                                <span class="badge rounded-pill text-bg-success">
+                                    Sim: {{ item[9] or 0 }}
+                                </span>
+                                <span class="badge rounded-pill text-bg-secondary">
+                                    Não: {{ item[10] or 0 }}
+                                </span>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="acoes-grid">
+                                <a href="{{ url_for('contatos_do_cabo', cabo_id=item[0]) }}" class="btn btn-info btn-sm">
+                                    Contatos
+                                </a>
+                                <a href="{{ url_for('enviar_convite', cabo_id=item[0]) }}" class="btn btn-primary btn-sm">
+                                    Convidar
+                                </a>
+                                <a href="{{ url_for('editar', id=item[0]) }}" class="btn btn-warning btn-sm">
+                                    Editar
+                                </a>
+                                <a href="{{ url_for('excluir', id=item[0]) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Deseja realmente excluir este registro?')">
+                                    Excluir
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11" class="text-center text-muted py-4">
+                            Nenhum registro encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

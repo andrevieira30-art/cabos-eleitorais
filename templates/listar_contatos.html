@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Listar Contatos{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+            <div>
+                <h2 class="card-title m-0">Contatos de Apoiadores</h2>
+                <small class="text-muted">Acompanhe os contatos cadastrados por cada líder.</small>
+            </div>
+
+            <div class="acoes-grid">
+                <a href="{{ url_for('exportar_contatos_excel', busca=termo, cabo_id=cabo_id, regiao=regiao) }}" class="btn btn-success">
+                    Exportar Excel
+                </a>
+                <a href="{{ url_for('cadastrar_contato') }}" class="btn btn-verde-claro">
+                    Novo Contato
+                </a>
+            </div>
+        </div>
+
+        <form method="GET" action="{{ url_for('listar_contatos') }}" class="row g-2 mb-4">
+            <div class="col-md-4">
+                <input type="text"
+                       name="busca"
+                       class="form-control"
+                       placeholder="Pesquisar por nome"
+                       value="{{ termo or '' }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="cabo_id" class="form-select">
+                    <option value="">Todos os Apoiadores</option>
+                    {% for cabo in cabos %}
+                        <option value="{{ cabo[0] }}" {% if cabo_id == cabo[0]|string %}selected{% endif %}>
+                            {{ cabo[1] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select name="regiao" class="form-select">
+                    <option value="">Todas as regiões</option>
+                    {% for item in regioes %}
+                        <option value="{{ item }}" {% if regiao == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <a href="{{ url_for('listar_contatos') }}" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-contatos">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th style="min-width: 180px;">Nome</th>
+                        <th style="min-width: 220px;">E-mail</th>
+                        <th style="min-width: 140px;">Telefone</th>
+                        <th style="min-width: 120px;">Região</th>
+                        <th style="min-width: 220px;">Liderança</th>
+                        <th style="min-width: 120px;">Nascimento</th>
+                        <th style="min-width: 110px;">CEP</th>
+                        <th style="min-width: 130px;">Consentiu</th>
+                        <th style="min-width: 140px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in registros %}
+                    <tr>
+                        <td>
+                            <span class="badge text-bg-secondary">#{{ item[0] }}</span>
+                        </td>
+
+                        <td class="fw-semibold nome-coluna">{{ item[1] }}</td>
+
+                        <td>{{ item[2] or '-' }}</td>
+
+                        <td>{{ item[3] or '-' }}</td>
+
+                        <td>
+                            {% if item[4] %}
+                                <span class="badge rounded-pill text-bg-primary">{{ item[4] }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="nome-coluna">{{ item[5] or '-' }}</td>
+
+                        <td>{{ item[6].strftime('%d/%m/%Y') if item[6] else '-' }}</td>
+
+                        <td>{{ item[7] or '-' }}</td>
+
+                        <td>
+                            {% if item[8] == 'S' %}
+                                <span class="badge rounded-pill text-bg-success">Sim</span>
+                            {% elif item[8] == 'N' %}
+                                <span class="badge rounded-pill text-bg-danger">Não</span>
+                            {% else %}
+                                <span class="badge rounded-pill text-bg-secondary">Não informado</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="acoes-grid">
+                                <a href="{{ url_for('editar_contato', id=item[0]) }}" class="btn btn-warning btn-sm">
+                                    Editar
+                                </a>
+
+                                <a href="{{ url_for('excluir_contato', id=item[0]) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Deseja realmente excluir este contato?')">
+                                    Excluir
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">
+                            Nenhum contato encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

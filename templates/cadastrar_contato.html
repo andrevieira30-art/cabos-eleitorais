@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastrar Contato{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="card-title mb-4">Cadastrar Contato de Apoiadores</h2>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Telefone</label>
+                <input type="text" name="telefone" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">E-mail</label>
+                <input type="email" name="email" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Endereço</label>
+                <input type="text" name="endereco" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Data de Nascimento</label>
+                <input type="date" name="data_nascimento" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">CEP</label>
+                <input type="text" name="cep" class="form-control" maxlength="10">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Região Administrativa</label>
+                <input type="text" name="regiao_administrativa" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Lider Responsável</label>
+                <select name="cabo_id" class="form-select" required>
+                    <option value="">Selecione</option>
+                    {% for cabo in cabos %}
+                        <option value="{{ cabo[0] }}">{{ cabo[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="S" name="consentiu_contato" id="consentiu">
+                <label class="form-check-label" for="consentiu">
+                    Consentiu receber contato
+                </label>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Observação</label>
+                <textarea name="observacao" class="form-control" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a href="{{ url_for('listar_contatos') }}" class="btn btn-secondary">Voltar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

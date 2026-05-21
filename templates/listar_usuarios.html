@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Usuários do Sistema{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="card-title m-0">Usuários do Sistema</h2>
+                <small class="text-muted">Controle de acessos e perfis.</small>
+            </div>
+            <a href="{{ url_for('cadastrar_usuario') }}" class="btn btn-success">Novo Usuário</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Liderança</th>
+                        <th>Ativo</th>
+                        <th>Data Cadastro</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in usuarios %}
+                    <tr>
+                        <td>#{{ item[0] }}</td>
+                        <td>{{ item[1] }}</td>
+                        <td>{{ item[2] }}</td>
+                        <td>{{ item[3] }}</td>
+                        <td>{{ item[5] or '-' }}</td>
+                        <td>{{ item[6] }}</td>
+                        <td>{{ item[7].strftime('%d/%m/%Y') if item[7] else '-' }}</td>
+                        <td>
+                            <div class="acoes-grid">
+                                <a href="{{ url_for('editar_usuario', id=item[0]) }}" class="btn btn-warning btn-sm">Editar</a>
+                                <a href="{{ url_for('inativar_usuario', id=item[0]) }}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Deseja inativar este usuário?')">Inativar</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">Nenhum usuário encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

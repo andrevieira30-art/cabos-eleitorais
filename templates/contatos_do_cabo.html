@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Contatos do Líder{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body">
+                <h2 class="card-title mb-3">Contatos do Líder</h2>
+
+                <p class="mb-2">
+                    <strong>Nome:</strong> {{ cabo[1] }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Região Administrativa:</strong>
+                    {% if cabo[2] %}
+                        <span class="badge rounded-pill text-bg-primary">{{ cabo[2] }}</span>
+                    {% else %}
+                        <span class="text-muted">-</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 h-100 card-indicador card-contatos">
+            <div class="card-body">
+                <h3 class="h4 mb-3">Total de Apoiadores</h3>
+                <div class="display-4 fw-bold">{{ total_contatos }}</div>
+                <p class="mb-0 mt-3">Apoiadores vinculados a este líder</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <h3 class="m-0">Lista de Apoiadores</h3>
+
+            <div class="acoes-grid">
+                <a href="{{ url_for('exportar_contatos_do_cabo', cabo_id=cabo[0]) }}" class="btn btn-success">
+                    Exportar Excel
+                </a>
+                <a href="{{ url_for('listar') }}" class="btn btn-secondary">
+                    Voltar
+                </a>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-contatos">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th style="min-width: 180px;">Nome</th>
+                        <th style="min-width: 140px;">Telefone</th>
+                        <th style="min-width: 220px;">Endereço</th>
+                        <th style="min-width: 130px;">Data Nascimento</th>
+                        <th style="min-width: 110px;">CEP</th>
+                        <th style="min-width: 120px;">Região</th>
+                        <th style="min-width: 130px;">Consentiu contato</th>
+                        <th style="min-width: 180px;">Observação</th>
+                        <th style="min-width: 150px;">Data Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in contatos %}
+                    <tr>
+                        <td>
+                            <span class="badge text-bg-secondary">#{{ item[0] }}</span>
+                        </td>
+
+                        <td class="fw-semibold nome-coluna">{{ item[1] or '-' }}</td>
+
+                        <td>{{ item[2] or '-' }}</td>
+
+                        <td class="texto-endereco">{{ item[3] or '-' }}</td>
+
+                        <td>{{ item[4].strftime('%d/%m/%Y') if item[4] else '-' }}</td>
+
+                        <td>{{ item[5] or '-' }}</td>
+
+                        <td>
+                            {% if item[6] %}
+                                <span class="badge rounded-pill text-bg-primary">{{ item[6] }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item[7] == 'S' %}
+                                <span class="badge rounded-pill text-bg-success">Sim</span>
+                            {% elif item[7] == 'N' %}
+                                <span class="badge rounded-pill text-bg-danger">Não</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ item[8] or '-' }}</td>
+
+                        <td>{{ item[9].strftime('%d/%m/%Y %H:%M:%S') if item[9] else '-' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">
+                            Nenhum apoiador encontrado para este líder.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

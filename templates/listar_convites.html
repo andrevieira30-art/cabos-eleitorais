@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Convites Enviados{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('exportar_convites_excel', busca=termo, status=status, status_envio=status_envio, cabo_id=cabo_id) }}"
+             class="btn btn-success">
+                Exportar Excel
+            </a>
+
+            <a href="{{ url_for('listar') }}" class="btn btn-secondary">
+                Voltar
+            </a>
+        </div>
+
+        <form method="GET" action="{{ url_for('listar_convites') }}" class="row g-2 mb-4">
+            <div class="col-md-3">
+                <input type="text"
+                       name="busca"
+                       class="form-control"
+                       placeholder="Pesquisar por e-mail"
+                       value="{{ termo or '' }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="cabo_id" class="form-select">
+                    <option value="">Todas as lideranças</option>
+                    {% for cabo in cabos %}
+                        <option value="{{ cabo[0] }}" {% if cabo_id == cabo[0]|string %}selected{% endif %}>
+                            {{ cabo[1] }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">Todos os convites</option>
+                    <option value="PENDENTE" {% if status == 'PENDENTE' %}selected{% endif %}>Pendente</option>
+                    <option value="USADO" {% if status == 'USADO' %}selected{% endif %}>Usado</option>
+                    <option value="EXPIRADO" {% if status == 'EXPIRADO' %}selected{% endif %}>Expirado</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select name="status_envio" class="form-select">
+                    <option value="">Todos os envios</option>
+                    <option value="ENVIADO" {% if status_envio == 'ENVIADO' %}selected{% endif %}>Enviado</option>
+                    <option value="RECUSADO" {% if status_envio == 'RECUSADO' %}selected{% endif %}>Recusado</option>
+                    <option value="ERRO" {% if status_envio == 'ERRO' %}selected{% endif %}>Erro</option>
+                    <option value="PENDENTE" {% if status_envio == 'PENDENTE' %}selected{% endif %}>Pendente</option>
+                </select>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary">Filtrar</button>
+            </div>
+
+            <div class="col-md-1 d-grid">
+                <a href="{{ url_for('listar_convites') }}" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle tabela-contatos">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th style="min-width: 220px;">E-mail</th>
+                        <th style="min-width: 220px;">Liderança</th>
+                        <th style="min-width: 110px;">Convite</th>
+                        <th style="min-width: 110px;">Envio</th>
+                        <th style="min-width: 120px;">Enviado em</th>
+                        <th style="min-width: 120px;">Expira em</th>
+                        <th style="min-width: 120px;">Usado em</th>
+                        <th style="min-width: 220px;">Erro</th>
+                        <th style="min-width: 150px;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in registros %}
+                    <tr>
+                        <td><span class="badge text-bg-secondary">#{{ item[0] }}</span></td>
+
+                        <td>{{ item[1] }}</td>
+
+                        <td class="nome-coluna">{{ item[2] }}</td>
+
+                        <td>
+                            {% if item[3] == 'PENDENTE' %}
+                                <span class="badge rounded-pill text-bg-warning">Pendente</span>
+                            {% elif item[3] == 'USADO' %}
+                                <span class="badge rounded-pill text-bg-success">Usado</span>
+                            {% elif item[3] == 'EXPIRADO' %}
+                                <span class="badge rounded-pill text-bg-danger">Expirado</span>
+                            {% else %}
+                                <span class="badge rounded-pill text-bg-secondary">{{ item[3] or '-' }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if item[4] == 'ENVIADO' %}
+                                <span class="badge rounded-pill text-bg-success">Enviado</span>
+                            {% elif item[4] == 'RECUSADO' %}
+                                <span class="badge rounded-pill text-bg-warning">Recusado</span>
+                            {% elif item[4] == 'ERRO' %}
+                                <span class="badge rounded-pill text-bg-danger">Erro</span>
+                            {% elif item[4] == 'PENDENTE' %}
+                                <span class="badge rounded-pill text-bg-secondary">Pendente</span>
+                            {% else %}
+                                <span class="badge rounded-pill text-bg-secondary">{{ item[4] or '-' }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ item[5].strftime('%d/%m/%Y %H:%M') if item[5] else '-' }}</td>
+                        <td>{{ item[6].strftime('%d/%m/%Y %H:%M') if item[6] else '-' }}</td>
+                        <td>{{ item[7].strftime('%d/%m/%Y %H:%M') if item[7] else '-' }}</td>
+                        <td>{{ item[8] or '-' }}</td>
+
+                        <td>
+                            <div class="acoes-grid">
+                                <a href="{{ url_for('reenviar_convite', convite_id=item[0]) }}" class="btn btn-primary btn-sm">
+                                    Reenviar
+                                </a>
+                                <a href="{{ url_for('cancelar_convite', convite_id=item[0]) }}"
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Deseja cancelar este convite?')">
+                                    Cancelar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center text-muted py-4">
+                            Nenhum convite encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

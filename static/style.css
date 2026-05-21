@@ -1,0 +1,291 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.navbar-verde {
+    background: linear-gradient(90deg, #7cc66a, #9ad98c);
+}
+
+.logo-navbar {
+    height: 32px;
+    width: 32px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+}
+
+.logo-dashboard {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.container {
+    max-width: 1280px;
+}
+
+.card {
+    border-radius: 14px;
+    border: 1px solid #dfe3e6;
+    margin-bottom: 20px;
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+    font-size: 0.95rem;
+}
+
+.table th {
+    white-space: nowrap;
+}
+
+.tabela-cabos .btn-sm,
+.tabela-contatos .btn-sm {
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+}
+
+.tabela-cabos .badge,
+.tabela-contatos .badge {
+    font-weight: 600;
+}
+
+.acoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tabela-contatos th,
+.tabela-contatos td,
+.tabela-cabos th,
+.tabela-cabos td {
+    vertical-align: middle;
+}
+
+.tabela-contatos td,
+.tabela-cabos td {
+    white-space: normal;
+}
+
+.tabela-cabos {
+    width: 100%;
+    table-layout: auto;
+}
+
+.tabela-cabos th,
+.tabela-cabos td {
+    vertical-align: middle;
+}
+
+.tabela-cabos td {
+    font-size: 0.95rem;
+}
+
+.texto-endereco {
+    max-width: 220px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.consentimento-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.acoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.acoes-grid .btn {
+    width: 100%;
+}
+
+.tabela-cabos .badge {
+    font-weight: 600;
+}
+
+.tabela-cabos .btn-sm {
+    padding: 0.32rem 0.6rem;
+    border-radius: 8px;
+}
+
+.btn-verde-claro {
+    background-color: #8fd17f;
+    border-color: #8fd17f;
+    color: #1f3b1f;
+}
+
+.btn-verde-claro:hover {
+    background-color: #7ec86a;
+    border-color: #7ec86a;
+    color: #1f3b1f;
+}
+
+.card-indicador {
+    color: #fff;
+    border: none;
+}
+
+.card-cabos {
+    background: linear-gradient(135deg, #6bbf59, #8fd17f);
+}
+
+.card-contatos {
+    background: linear-gradient(135deg, #4caf50, #81c784);
+}
+
+/* Corrige formulários quebrados */
+form .row > div {
+    margin-bottom: 8px;
+}
+
+/* Corrige blocos de ações */
+.acoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Corrige topo */
+.navbar .btn {
+    white-space: nowrap;
+}
+
+/* Ajuste mobile */
+@media (max-width: 768px) {
+    .container {
+        max-width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .logo-dashboard {
+        height: 38px;
+    }
+
+    .table td,
+    .table th {
+        font-size: 0.88rem;
+    }
+}
+.tabela-cabos {
+    width: 100%;
+    table-layout: auto;
+}
+
+.tabela-cabos th,
+.tabela-cabos td {
+    vertical-align: middle;
+}
+
+.nome-coluna {
+    width: 170px;
+    max-width: 170px;
+}
+
+.email-coluna {
+    width: 220px;
+    max-width: 220px;
+}
+
+.texto-endereco {
+    width: 200px;
+    max-width: 200px;
+}
+
+.consentimento-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 120px;
+}
+
+.acoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 140px;
+}
+
+.tabela-cabos .btn-sm {
+    padding: 0.32rem 0.6rem;
+    border-radius: 8px;
+}
+
+.tabela-cabos .badge {
+    font-weight: 600;
+}
+
+.acoes-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 95px;
+}
+
+.acoes-grid .btn {
+    width: 100%;
+}
+
+.acoes-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 160px;
+}
+
+.acoes-grid .btn {
+    width: auto;
+}
+.tabela-cabos {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.tabela-cabos th,
+.tabela-cabos td {
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    font-size: 0.95rem;
+}
+
+.nome-coluna {
+    width: 180px;
+    max-width: 180px;
+}
+
+.email-coluna {
+    width: 220px;
+    max-width: 220px;
+}
+
+.texto-endereco {
+    width: 210px;
+    max-width: 210px;
+    line-height: 1.4;
+}
