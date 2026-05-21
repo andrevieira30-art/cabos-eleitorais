@@ -2,8 +2,7 @@ import os
 import oracledb
 from dotenv import load_dotenv
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-load_dotenv(os.path.join(BASE_DIR, ".env"))
+load_dotenv()
 
 ORACLE_USER = os.getenv("ORACLE_USER")
 ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD")
@@ -15,12 +14,13 @@ def conectar_oracle():
         conexao = oracledb.connect(
             user=ORACLE_USER,
             password=ORACLE_PASSWORD,
-            dsn=ORACLE_DSN
+            dsn=f"{ORACLE_DSN}:1522/?service_name={ORACLE_DSN}",
+            protocol="tcps"
         )
 
-        print("Conectado no Oracle com sucesso")
+        print("Conectado ao Oracle com sucesso!")
         return conexao
 
-    except oracledb.Error as erro:
+    except Exception as erro:
         print("Erro ao conectar no Oracle:", erro)
         return None
