@@ -10,30 +10,11 @@ ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD")
 
 def conectar_oracle():
     try:
-        dsn = """
-        (description=
-            (retry_count=2)
-            (retry_delay=1)
-            (transport_connect_timeout=10)
-            (connect_timeout=10)
-            (address=
-                (protocol=tcps)
-                (host=adb.sa-saopaulo-1.oraclecloud.com)
-                (port=1522)
-            )
-            (connect_data=
-                (service_name=g5087928fba57e8_orclapi_high.adb.oraclecloud.com)
-            )
-            (security=
-                (ssl_server_dn_match=yes)
-            )
-        )
-        """
-
         conexao = oracledb.connect(
             user=ORACLE_USER,
             password=ORACLE_PASSWORD,
-            dsn=dsn
+            dsn="adb.sa-saopaulo-1.oraclecloud.com:1522/g5087928fba57e8_orclapi_low.adb.oraclecloud.com",
+            protocol="tcps"
         )
 
         print("Conectado ao Oracle com sucesso!")
