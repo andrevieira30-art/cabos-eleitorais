@@ -14,7 +14,9 @@ def conectar_oracle():
         conexao = oracledb.connect(
             user=ORACLE_USER,
             password=ORACLE_PASSWORD,
-            dsn=f"{ORACLE_DSN}:1522/?service_name={ORACLE_DSN}",
+            host="adb.sa-saopaulo-1.oraclecloud.com",
+            port=1522,
+            service_name=ORACLE_DSN,
             protocol="tcps"
         )
 
