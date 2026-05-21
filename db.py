@@ -12,12 +12,14 @@ def conectar_oracle():
     try:
         dsn = """
         (description=
-            (retry_count=20)
-            (retry_delay=3)
+            (retry_count=2)
+            (retry_delay=1)
+            (transport_connect_timeout=10)
+            (connect_timeout=10)
             (address=
                 (protocol=tcps)
-                (port=1522)
                 (host=adb.sa-saopaulo-1.oraclecloud.com)
+                (port=1522)
             )
             (connect_data=
                 (service_name=g5087928fba57e8_orclapi_high.adb.oraclecloud.com)
