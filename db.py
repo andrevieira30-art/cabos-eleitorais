@@ -6,18 +6,32 @@ load_dotenv()
 
 ORACLE_USER = os.getenv("ORACLE_USER")
 ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD")
-ORACLE_DSN = os.getenv("ORACLE_DSN")
 
 
 def conectar_oracle():
     try:
+        dsn = """
+        (description=
+            (retry_count=20)
+            (retry_delay=3)
+            (address=
+                (protocol=tcps)
+                (port=1522)
+                (host=adb.sa-saopaulo-1.oraclecloud.com)
+            )
+            (connect_data=
+                (service_name=g5087928fba57e8_orclapi_high.adb.oraclecloud.com)
+            )
+            (security=
+                (ssl_server_dn_match=yes)
+            )
+        )
+        """
+
         conexao = oracledb.connect(
             user=ORACLE_USER,
             password=ORACLE_PASSWORD,
-            host="adb.sa-saopaulo-1.oraclecloud.com",
-            port=1522,
-            service_name=ORACLE_DSN,
-            protocol="tcps"
+            dsn=dsn
         )
 
         print("Conectado ao Oracle com sucesso!")
