@@ -591,6 +591,7 @@ def editar(id):
 
 @app.route("/excluir/<int:id>")
 @login_required
+@perfil_required("ADMIN", "CHEFE_GABINETE")
 def excluir(id):
     conexao = conectar_oracle()
     if conexao is None:
@@ -600,17 +601,48 @@ def excluir(id):
     cursor = conexao.cursor()
 
     try:
-        cursor.execute("DELETE FROM CABOS_ELEITORAIS WHERE ID = :1", (id,))
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM CONTATOS_CAMPANHA
+            WHERE CABO_ID = :1
+        """, (id,))
+        total_contatos = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM CONVITES_CONTATO
+            WHERE CABO_ID = :1
+        """, (id,))
+        total_convites = cursor.fetchone()[0]
+
+        if total_contatos > 0 or total_convites > 0:
+            flash(
+                f"Não é possível excluir esta liderança. "
+                f"Existem {total_contatos} apoiador(es) e "
+                f"{total_convites} convite(s) vinculados a ela. "
+                f"Cancele/remova os vínculos antes de excluir.",
+                "warning"
+            )
+            return redirect(url_for("listar"))
+
+        cursor.execute("""
+            DELETE FROM CABOS_ELEITORAIS
+            WHERE ID = :1
+        """, (id,))
+
         conexao.commit()
-        flash("Registro excluído com sucesso.", "success")
+        flash("Liderança excluída com sucesso.", "success")
+
     except oracledb.Error as erro:
-        flash(f"Erro ao excluir registro: {erro}", "danger")
+        conexao.rollback()
+        flash(f"Erro ao excluir liderança: {erro}", "danger")
+        print("ERRO AO EXCLUIR LIDERANÇA:", erro)
+
     finally:
         cursor.close()
         conexao.close()
 
     return redirect(url_for("listar"))
-
 
 # =========================
 # Contatos / Apoiadores
