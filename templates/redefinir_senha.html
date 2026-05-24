@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Redefinir senha{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h3 class="mb-3 text-center">Redefinir Senha</h3>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nova senha</label>
+                        <input type="password" name="nova_senha" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar nova senha</label>
+                        <input type="password" name="confirmar_senha" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        Salvar nova senha
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

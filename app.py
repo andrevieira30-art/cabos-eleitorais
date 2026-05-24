@@ -2,12 +2,15 @@ import os
 import secrets
 import smtplib
 import pytz
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from io import BytesIO
 from datetime import datetime
 from functools import wraps
+from itsdangerous import URLSafeTimedSerializer
+from werkzeug.security import generate_password_hash
 
 
 from flask import Flask, render_template, request, redirect, url_for, flash, send_file, session
@@ -38,6 +41,8 @@ app.secret_key = os.getenv("FLASK_SECRET_KEY", "chave_padrao")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "minha_chave_secreta_123")
+
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 def login_required(f):
     @wraps(f)
@@ -1738,7 +1743,168 @@ def inativar_usuario(id):
 
     return redirect(url_for("listar_usuarios"))
 
+@app.route("/esqueci-senha", methods=["GET", "POST"])
+def esqueci_senha():
 
+    if request.method == "POST":
+
+        email = request.form.get("email")
+
+        conexao = conectar_oracle()
+        cursor = conexao.cursor()
+
+        cursor.execute("""
+            SELECT ID, NOME, EMAIL
+            FROM USUARIOS_SISTEMA
+            WHERE UPPER(EMAIL) = UPPER(:1)
+              AND ATIVO = 'S'
+        """, (email,))
+
+        usuario = cursor.fetchone()
+
+        if usuario:
+
+            token = serializer.dumps(email, salt="recuperar-senha")
+
+            data_expiracao = datetime.now() + timedelta(minutes=30)
+
+            cursor.execute("""
+                INSERT INTO RECUPERACAO_SENHA
+                (
+                    USUARIO_ID,
+                    TOKEN,
+                    DATA_EXPIRACAO
+                )
+                VALUES
+                (
+                    :1,
+                    :2,
+                    :3
+                )
+            """, (
+                usuario[0],
+                token,
+                data_expiracao
+            ))
+
+            conexao.commit()
+
+            link = f"{BASE_URL}/redefinir-senha/{token}"
+
+            enviar_email(
+                destinatario=email,
+                assunto="Recuperação de Senha",
+                mensagem=f"""
+Olá {usuario[1]},
+
+Clique no link abaixo para redefinir sua senha:
+
+{link}
+
+O link expira em 30 minutos.
+"""
+            )
+
+        flash(
+            "Se o e-mail existir no sistema, um link de recuperação foi enviado.",
+            "info"
+        )
+
+        cursor.close()
+        conexao.close()
+
+        return redirect(url_for("login"))
+
+    return render_template("esqueci_senha.html")
+
+@app.route("/redefinir-senha/<token>", methods=["GET", "POST"])
+def redefinir_senha(token):
+    conexao = conectar_oracle()
+    if conexao is None:
+        flash("Não foi possível conectar ao banco de dados.", "danger")
+        return redirect(url_for("login"))
+
+    cursor = conexao.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT
+                r.ID,
+                r.USUARIO_ID,
+                r.TOKEN,
+                r.DATA_EXPIRACAO,
+                r.USADO,
+                u.EMAIL
+            FROM RECUPERACAO_SENHA r
+            JOIN USUARIOS_SISTEMA u ON u.ID = r.USUARIO_ID
+            WHERE r.TOKEN = :1
+        """, (token,))
+
+        recuperacao = cursor.fetchone()
+
+        if not recuperacao:
+            flash("Link de recuperação inválido.", "danger")
+            return redirect(url_for("login"))
+
+        recuperacao_id = recuperacao[0]
+        usuario_id = recuperacao[1]
+        data_expiracao = recuperacao[3]
+        usado = recuperacao[4]
+
+        if usado == "S":
+            flash("Este link de recuperação já foi utilizado.", "warning")
+            return redirect(url_for("login"))
+
+        if data_expiracao < datetime.now():
+            flash("Este link de recuperação expirou.", "warning")
+            return redirect(url_for("login"))
+
+        if request.method == "POST":
+            nova_senha = request.form.get("nova_senha", "").strip()
+            confirmar_senha = request.form.get("confirmar_senha", "").strip()
+
+            if not nova_senha or not confirmar_senha:
+                flash("Informe e confirme a nova senha.", "warning")
+                return render_template("redefinir_senha.html")
+
+            if nova_senha != confirmar_senha:
+                flash("As senhas não conferem.", "warning")
+                return render_template("redefinir_senha.html")
+
+            if len(nova_senha) < 8:
+                flash("A senha deve ter pelo menos 8 caracteres.", "warning")
+                return render_template("redefinir_senha.html")
+
+            senha_hash = generate_password_hash(nova_senha)
+
+            cursor.execute("""
+                UPDATE USUARIOS_SISTEMA
+                SET SENHA_HASH = :1
+                WHERE ID = :2
+            """, (senha_hash, usuario_id))
+
+            cursor.execute("""
+                UPDATE RECUPERACAO_SENHA
+                SET USADO = 'S'
+                WHERE ID = :1
+            """, (recuperacao_id,))
+
+            conexao.commit()
+
+            flash("Senha redefinida com sucesso. Faça login novamente.", "success")
+            return redirect(url_for("login"))
+
+    except Exception as erro:
+        conexao.rollback()
+        print("ERRO AO REDEFINIR SENHA:", erro)
+        flash("Não foi possível redefinir a senha.", "danger")
+        return redirect(url_for("login"))
+
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return render_template("redefinir_senha.html")
 
 # =========================
 # Convites
