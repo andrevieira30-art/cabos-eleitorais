@@ -8,11 +8,11 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 ORACLE_USER = os.getenv("ORACLE_USER")
 ORACLE_PASSWORD = os.getenv("ORACLE_PASSWORD")
+ORACLE_WALLET_PASSWORD = os.getenv("ORACLE_WALLET_PASSWORD")
 
 
 def conectar_oracle():
     try:
-
         wallet_path = os.path.join(BASE_DIR, "wallet")
 
         conexao = oracledb.connect(
@@ -21,7 +21,7 @@ def conectar_oracle():
             dsn="orclapi_low",
             config_dir=wallet_path,
             wallet_location=wallet_path,
-            wallet_password=ORACLE_PASSWORD
+            wallet_password=ORACLE_WALLET_PASSWORD
         )
 
         print("Conectado ao Oracle com sucesso!")
