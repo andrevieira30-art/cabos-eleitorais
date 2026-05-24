@@ -48,6 +48,19 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.template_filter("data_br")
+def data_br(data):
+    if not data:
+        return "-"
+
+    fuso_brasilia = pytz.timezone("America/Sao_Paulo")
+
+    if data.tzinfo is None:
+        data = pytz.utc.localize(data)
+
+    data_brasilia = data.astimezone(fuso_brasilia)
+
+    return data_brasilia.strftime("%d/%m/%Y %H:%M")
 
 def perfil_required(*tipos_permitidos):
     def decorator(f):

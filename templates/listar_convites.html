@@ -115,9 +115,9 @@
                             {% endif %}
                         </td>
 
-                        <td>{{ item[5].strftime('%d/%m/%Y %H:%M') if item[5] else '-' }}</td>
-                        <td>{{ item[6].strftime('%d/%m/%Y %H:%M') if item[6] else '-' }}</td>
-                        <td>{{ item[7].strftime('%d/%m/%Y %H:%M') if item[7] else '-' }}</td>
+                        <td>{{ item[5]|data_br }}</td>
+                        <td>{{ item[6]|data_br }}</td>
+                        <td>{{ item[7]|data_br }}</td>
                         <td>{{ item[8] or '-' }}</td>
 
                         <td>
