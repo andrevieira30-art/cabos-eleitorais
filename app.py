@@ -609,6 +609,12 @@ def excluir(id):
         total_contatos = cursor.fetchone()[0]
 
         cursor.execute("""
+            DELETE FROM CONVITES_CONTATO
+            WHERE CABO_ID = :1
+              AND STATUS = 'CANCELADO'
+        """, (id,))
+
+        cursor.execute("""
             SELECT COUNT(*)
             FROM CONVITES_CONTATO
             WHERE CABO_ID = :1
@@ -616,11 +622,11 @@ def excluir(id):
         total_convites = cursor.fetchone()[0]
 
         if total_contatos > 0 or total_convites > 0:
+            conexao.rollback()
             flash(
                 f"Não é possível excluir esta liderança. "
                 f"Existem {total_contatos} apoiador(es) e "
-                f"{total_convites} convite(s) vinculados a ela. "
-                f"Cancele/remova os vínculos antes de excluir.",
+                f"{total_convites} convite(s) ativo(s)/histórico(s) vinculados a ela.",
                 "warning"
             )
             return redirect(url_for("listar"))
