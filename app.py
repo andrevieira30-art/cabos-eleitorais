@@ -2145,6 +2145,7 @@ def reenviar_convite(convite_id):
 
 @app.route("/cancelar-convite/<int:convite_id>")
 @login_required
+@perfil_required("ADMIN", "CHEFE_GABINETE", "SECRETARIA")
 def cancelar_convite(convite_id):
     conexao = conectar_oracle()
     if conexao is None:
@@ -2155,16 +2156,42 @@ def cancelar_convite(convite_id):
 
     try:
         cursor.execute("""
-            UPDATE CONVITES_CONTATO
-            SET STATUS = 'EXPIRADO'
+            SELECT ID, STATUS
+            FROM CONVITES_CONTATO
             WHERE ID = :1
-              AND STATUS = 'PENDENTE'
         """, (convite_id,))
+        convite = cursor.fetchone()
+
+        if not convite:
+            flash("Convite não encontrado.", "warning")
+            return redirect(url_for("listar_convites"))
+
+        status_atual = convite[1]
+
+        if status_atual == "USADO":
+            flash("Não é possível cancelar um convite que já foi utilizado.", "warning")
+            return redirect(url_for("listar_convites"))
+
+        if status_atual == "CANCELADO":
+            flash("Este convite já está cancelado.", "info")
+            return redirect(url_for("listar_convites"))
+
+        cursor.execute("""
+            UPDATE CONVITES_CONTATO
+            SET STATUS = 'CANCELADO',
+                ERRO_ENVIO = 'Convite cancelado pelo usuário'
+            WHERE ID = :1
+        """, (convite_id,))
+
         conexao.commit()
+
         flash("Convite cancelado com sucesso.", "success")
+
     except oracledb.Error as erro:
+        conexao.rollback()
         flash(f"Erro ao cancelar convite: {erro}", "danger")
-        print("ERRO CANCELAR CONVITE:", erro)
+        print("ERRO AO CANCELAR CONVITE:", erro)
+
     finally:
         cursor.close()
         conexao.close()

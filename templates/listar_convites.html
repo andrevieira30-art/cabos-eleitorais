@@ -96,11 +96,12 @@
                                 <span class="badge rounded-pill text-bg-success">Usado</span>
                             {% elif item[3] == 'EXPIRADO' %}
                                 <span class="badge rounded-pill text-bg-danger">Expirado</span>
+                            {% elif item[3] == 'CANCELADO' %}
+                                <span class="badge rounded-pill text-bg-secondary">Cancelado</span>
                             {% else %}
                                 <span class="badge rounded-pill text-bg-secondary">{{ item[3] or '-' }}</span>
                             {% endif %}
                         </td>
-
                         <td>
                             {% if item[4] == 'ENVIADO' %}
                                 <span class="badge rounded-pill text-bg-success">Enviado</span>
@@ -126,9 +127,10 @@
                                     Reenviar
                                 </a>
                                 <a href="{{ url_for('cancelar_convite', convite_id=item[0]) }}"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="return confirm('Deseja cancelar este convite?')">
-                                    Cancelar
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Deseja realmente cancelar este convite?')">
+                                Cancelar
+                                </a>
                                 </a>
                             </div>
                         </td>
