@@ -1993,26 +1993,29 @@ def enviar_convite(cabo_id):
 
             link_convite = f"{BASE_URL}/convite/{token}"
 
-            recusados = enviar_email_convite(email, cabo[1], link_convite)
+        email_enviado = enviar_email_convite(email, cabo[1], link_convite)
 
-            if recusados:
-                cursor.execute("""
-                    UPDATE CONVITES_CONTATO
-                    SET STATUS_ENVIO = 'RECUSADO',
-                        ERRO_ENVIO = :1
-                    WHERE TOKEN = :2
-                """, (str(recusados)[:500], token))
-                conexao.commit()
-                flash("O servidor recusou o destinatário.", "warning")
-            else:
-                cursor.execute("""
-                    UPDATE CONVITES_CONTATO
-                    SET STATUS_ENVIO = 'ENVIADO',
-                        ERRO_ENVIO = NULL
-                    WHERE TOKEN = :1
-                """, (token,))
-                conexao.commit()
-                flash("Convite enviado com sucesso.", "success")
+        if email_enviado:
+            cursor.execute("""
+                UPDATE CONVITES_CONTATO
+                SET STATUS_ENVIO = 'ENVIADO',
+                    ERRO_ENVIO = NULL,
+                    DATA_ENVIO = SYSDATE
+                WHERE TOKEN = :1
+            """, (token,))
+
+            conexao.commit()
+            flash("Convite enviado com sucesso.", "success")
+        else:
+            cursor.execute("""
+                UPDATE CONVITES_CONTATO
+                SET STATUS_ENVIO = 'ERRO',
+                    ERRO_ENVIO = 'Falha ao enviar e-mail'
+                WHERE TOKEN = :1
+            """, (token,))
+
+            conexao.commit()
+            flash("Convite gerado, mas houve falha no envio do e-mail.", "warning")
 
             return redirect(url_for("listar"))
 
@@ -2306,6 +2309,7 @@ def reenviar_convite(convite_id):
         nome_cabo = convite[2]
 
         link_convite = f"{BASE_URL}/convite/{token}"
+        
         recusados = enviar_email_convite(email, nome_cabo, link_convite)
 
         if recusados:
