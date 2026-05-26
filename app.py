@@ -2678,17 +2678,11 @@ def enviar_convite(cabo_id):
 
         if request.method == "POST":
             email = request.form.get("email", "").strip().lower()
-            telefone = request.form.get("telefone", "").strip()            
-            forma_envio = request.form.get("forma_envio", "EMAIL").strip()
-            
+            telefone = request.form.get("telefone", "").strip()
 
-            if forma_envio in ("EMAIL", "AMBOS") and not email:
+            if not email:
                 flash("Informe o e-mail do apoiador.", "warning")
                 return render_template("enviar_convite.html", cabo=cabo)
-
-            if forma_envio in ("WHATSAPP", "AMBOS") and not telefone:
-                flash("Informe o telefone/WhatsApp do apoiador.", "warning")
-                return render_template("enviar_convite.html", cabo=cabo)         
 
             cursor.execute("""
                 SELECT ID
@@ -2763,47 +2757,34 @@ Acesse o link:
 
             email_enviado = enviar_email_convite(email, cabo[1], link_convite)
 
-        email_enviado = False
+            if email_enviado:
+                cursor.execute("""
+                    UPDATE CONVITES_CONTATO
+                    SET STATUS_ENVIO = 'ENVIADO',
+                        ERRO_ENVIO = NULL,
+                        DATA_ENVIO = SYSDATE
+                    WHERE TOKEN = :1
+                """, (token,))
 
-        if forma_envio in ("EMAIL", "AMBOS"):
-            email_enviado = enviar_email_convite(email, cabo[1], link_convite)
+                conexao.commit()
+                flash("Convite enviado com sucesso.", "success")
 
-        if forma_envio == "WHATSAPP":
-            cursor.execute("""
-                UPDATE CONVITES_CONTATO
-                SET STATUS_ENVIO = 'WHATSAPP',
-                    ERRO_ENVIO = NULL,
-                    DATA_ENVIO = SYSDATE
-                WHERE TOKEN = :1
-            """, (token,))
-            conexao.commit()
-            flash("Convite gerado para envio via WhatsApp.", "success")
+            else:
+                cursor.execute("""
+                    UPDATE CONVITES_CONTATO
+                    SET STATUS_ENVIO = 'ERRO',
+                        ERRO_ENVIO = 'Falha ao enviar e-mail'
+                    WHERE TOKEN = :1
+                """, (token,))
 
-        elif email_enviado:
-            cursor.execute("""
-                UPDATE CONVITES_CONTATO
-                SET STATUS_ENVIO = 'ENVIADO',
-                    ERRO_ENVIO = NULL,
-                    DATA_ENVIO = SYSDATE
-                WHERE TOKEN = :1
-            """, (token,))
-            conexao.commit()
-            flash("Convite enviado com sucesso.", "success")
+                conexao.commit()
+                flash("Convite gerado, mas houve falha no envio do e-mail.", "warning")
 
-        else:
-            cursor.execute("""
-                UPDATE CONVITES_CONTATO
-                SET STATUS_ENVIO = 'ERRO',
-                    ERRO_ENVIO = 'Falha ao enviar e-mail'
-                WHERE TOKEN = :1
-            """, (token,))
-            conexao.commit()
-            flash("Convite gerado, mas houve falha no envio do e-mail.", "warning")
-    
             return render_template(
-            "convite_enviado.html",
-            whatsapp_link=whatsapp_link,
-            email=email)
+                "convite_enviado.html",
+                whatsapp_link=whatsapp_link,
+                email=email
+            )
 
     except oracledb.Error as erro:
         if token:
