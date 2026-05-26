@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Convite Enviado{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+        <h3>Convite gerado com sucesso</h3>
+
+        <p class="text-muted">
+            O convite foi enviado para: <strong>{{ email }}</strong>
+        </p>
+
+        {% if whatsapp_link %}
+            <a href="{{ whatsapp_link }}"
+               target="_blank"
+               class="btn btn-success">
+                Enviar também pelo WhatsApp
+            </a>
+        {% endif %}
+
+        <a href="{{ url_for('listar') }}" class="btn btn-secondary">
+            Voltar
+        </a>
+    </div>
+</div>
+{% endblock %}
