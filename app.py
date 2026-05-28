@@ -78,6 +78,14 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 # Cria a aplicação Flask.
 app = Flask(__name__)
 
+# ============================================================
+# Expiração de sessão automática
+# ============================================================
+
+from datetime import timedelta
+
+app.permanent_session_lifetime = timedelta(minutes=30)
+
 # Define a chave secreta usada para sessão, flash messages e tokens.
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "chave_padrao")
 
@@ -2054,9 +2062,15 @@ def login():
             if not senha_hash or not check_password_hash(senha_hash, senha):
                 flash("Usuário ou senha inválidos.", "danger")
                 return render_template("login.html")
+            
+            # =========================
+            # LOGIN REALIZADO COM SUCESSO
+            # =========================
 
             session.clear()
-
+            
+            session.permanent = True
+            
             session["usuario_logado"] = True
             session["usuario_id"] = usuario_id
             session["usuario_nome"] = nome
