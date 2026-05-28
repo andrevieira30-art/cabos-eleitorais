@@ -12,6 +12,7 @@
                 <p><strong>Liderança:</strong> {{ cabo[1] }}</p>
 
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
                         <label class="form-label">Nome do apoiador</label>
                         <input type="text" name="nome_apoiador" class="form-control" required>

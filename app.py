@@ -8,6 +8,7 @@ import smtplib
 import pytz
 import oracledb
 
+from flask_wtf.csrf import CSRFProtect
 from urllib.parse import quote
 from datetime import datetime, timedelta
 from functools import wraps
@@ -77,12 +78,11 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 # Cria a aplicação Flask.
 app = Flask(__name__)
-
 # ============================================================
 # Expiração de sessão automática
 # ============================================================
 
-from datetime import timedelta
+csrf = CSRFProtect(app)
 
 app.permanent_session_lifetime = timedelta(minutes=30)
 
