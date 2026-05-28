@@ -57,6 +57,7 @@
 
                         {% if session.get('tipo_acesso') == 'ADMIN' %}
                             <a class="btn btn-outline-light btn-sm" href="{{ url_for('listar_usuarios') }}">Usuários</a>
+                            <a class="btn btn-outline-light btn-sm" href="{{ url_for('auditoria') }}">Auditoria</a>
                         {% endif %}
 
                         <a class="btn btn-danger btn-sm" href="{{ url_for('logout') }}">Sair</a>

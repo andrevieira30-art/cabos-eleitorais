@@ -1533,6 +1533,12 @@ def excluir_contato(id):
         """, (id,))
 
         conexao.commit()
+        
+        registrar_auditoria(
+        acao="EXCLUIR_CONTATO",
+        tabela_afetada="CONTATOS_CAMPANHA",
+        registro_id=id,
+        descricao=f"Contato ID {id} excluído do sistema.")
 
         flash("Apoiador excluído com sucesso.", "success")
 
@@ -2068,19 +2074,29 @@ def login():
         finally:
             cursor.close()
             conexao.close()
-
+            
+        registrar_auditoria(
+        acao="LOGIN",
+        tabela_afetada="USUARIOS_SISTEMA",
+        registro_id=usuario_id,
+        descricao=f"Usuário {nome} realizou login no sistema."
+    )
     return render_template("login.html")
 
-
 @app.route("/logout")
-@login_required
 def logout():
-    """
-    Encerra a sessão do usuário logado.
-    """
+
+    registrar_auditoria(
+        acao="LOGOUT",
+        tabela_afetada="USUARIOS_SISTEMA",
+        registro_id=session.get("usuario_id"),
+        descricao=f"Usuário {session.get('usuario_nome')} saiu do sistema."
+    )
 
     session.clear()
+
     flash("Logout realizado com sucesso.", "success")
+
     return redirect(url_for("login"))
 
 # ============================================================
@@ -2161,6 +2177,10 @@ def cadastrar_usuario():
             ))
 
             conexao.commit()
+            registrar_auditoria(
+            acao="CADASTRO_CONTATO",
+            tabela_afetada="CONTATOS_CAMPANHA",
+            descricao=f"Apoiador {nome} cadastrado para liderança ID {cabo_id}.")
 
             flash("Usuário cadastrado com sucesso.", "success")
             return redirect(url_for("listar_usuarios"))
@@ -3456,6 +3476,139 @@ def exportar_convites_excel():
         mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
+
+# ============================================================
+# REGISTRAR AUDITORIA REALIZADAS NO SISTEMA
+# ============================================================
+# ============================================================
+
+def registrar_auditoria(acao, tabela_afetada=None, registro_id=None, descricao=None):
+    """
+    Registra ações importantes realizadas no sistema.
+    """
+
+    try:
+        conexao = conectar_oracle()
+        if conexao is None:
+            return
+
+        cursor = conexao.cursor()
+
+        usuario_id = session.get("usuario_id")
+        usuario_nome = session.get("usuario_nome")
+        tipo_acesso = session.get("tipo_acesso")
+        ip_acesso = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+        cursor.execute("""
+            INSERT INTO AUDITORIA_LOGS
+                (
+                    USUARIO_ID,
+                    USUARIO_NOME,
+                    TIPO_ACESSO,
+                    ACAO,
+                    TABELA_AFETADA,
+                    REGISTRO_ID,
+                    DESCRICAO,
+                    IP_ACESSO
+                )
+            VALUES
+                (:1, :2, :3, :4, :5, :6, :7, :8)
+        """, (
+            usuario_id,
+            usuario_nome,
+            tipo_acesso,
+            acao,
+            tabela_afetada,
+            registro_id,
+            descricao,
+            ip_acesso
+        ))
+
+        conexao.commit()
+        cursor.close()
+        conexao.close()
+
+    except Exception as erro:
+        print("ERRO AO REGISTRAR AUDITORIA:", erro)
+        
+# ============================================================
+# Logs de Auditoria para o ADMIN consultar tudo
+# ============================================================
+
+@app.route("/auditoria")
+@login_required
+@perfil_required("ADMIN")
+def auditoria():
+    termo = request.args.get("busca", "").strip()
+    acao = request.args.get("acao", "").strip()
+
+    conexao = conectar_oracle()
+    if conexao is None:
+        flash("Não foi possível conectar ao banco de dados.", "danger")
+        return redirect(url_for("home"))
+
+    cursor = conexao.cursor()
+
+    try:
+        sql = """
+            SELECT
+                ID,
+                USUARIO_NOME,
+                TIPO_ACESSO,
+                ACAO,
+                TABELA_AFETADA,
+                REGISTRO_ID,
+                DESCRICAO,
+                IP_ACESSO,
+                DATA_LOG
+            FROM AUDITORIA_LOGS
+            WHERE 1=1
+        """
+
+        params = {}
+
+        if termo:
+            sql += """
+                AND (
+                    UPPER(USUARIO_NOME) LIKE UPPER(:busca)
+                    OR UPPER(DESCRICAO) LIKE UPPER(:busca)
+                    OR UPPER(IP_ACESSO) LIKE UPPER(:busca)
+                )
+            """
+            params["busca"] = f"%{termo}%"
+
+        if acao:
+            sql += " AND ACAO = :acao"
+            params["acao"] = acao
+
+        sql += " ORDER BY ID DESC"
+
+        cursor.execute(sql, params)
+        logs = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT DISTINCT ACAO
+            FROM AUDITORIA_LOGS
+            ORDER BY ACAO
+        """)
+        acoes = [r[0] for r in cursor.fetchall()]
+
+    except oracledb.Error as erro:
+        print("ERRO AUDITORIA:", erro)
+        flash("Erro ao carregar logs de auditoria.", "danger")
+        return redirect(url_for("home"))
+
+    finally:
+        cursor.close()
+        conexao.close()
+
+    return render_template(
+        "auditoria.html",
+        logs=logs,
+        termo=termo,
+        acao=acao,
+        acoes=acoes
+    )
 
 # ============================================================
 # EXECUÇÃO LOCAL

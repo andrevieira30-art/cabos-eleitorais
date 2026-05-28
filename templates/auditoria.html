@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Logs de Auditoria{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <h2 class="mb-4">Logs de Auditoria</h2>
+
+        <form method="GET" class="row g-2 mb-4">
+            <div class="col-md-5">
+                <input type="text"
+                       name="busca"
+                       class="form-control"
+                       placeholder="Buscar por usuário, descrição ou IP"
+                       value="{{ termo or '' }}">
+            </div>
+
+            <div class="col-md-3">
+                <select name="acao" class="form-select">
+                    <option value="">Todas as ações</option>
+                    {% for item in acoes %}
+                        <option value="{{ item }}" {% if acao == item %}selected{% endif %}>
+                            {{ item }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-primary" type="submit">Filtrar</button>
+            </div>
+
+            <div class="col-md-2 d-grid">
+                <a href="{{ url_for('auditoria') }}" class="btn btn-secondary">Limpar</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuário</th>
+                        <th>Perfil</th>
+                        <th>Ação</th>
+                        <th>Tabela</th>
+                        <th>Registro</th>
+                        <th>Descrição</th>
+                        <th>IP</th>
+                        <th>Data/Hora</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>#{{ log[0] }}</td>
+                        <td>{{ log[1] or '-' }}</td>
+                        <td>{{ log[2] or '-' }}</td>
+                        <td>
+                            <span class="badge text-bg-dark">{{ log[3] }}</span>
+                        </td>
+                        <td>{{ log[4] or '-' }}</td>
+                        <td>{{ log[5] or '-' }}</td>
+                        <td>{{ log[6] or '-' }}</td>
+                        <td>{{ log[7] or '-' }}</td>
+                        <td>{{ log[8]|data_br }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">
+                            Nenhum log encontrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Voltar</a>
+    </div>
+</div>
+{% endblock %}
